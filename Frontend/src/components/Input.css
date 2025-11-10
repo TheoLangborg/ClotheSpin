@@ -1,0 +1,139 @@
+/* === Grundlayout === */
+.page-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;  /* gör att sidan växer med innehåll */
+  overflow-x: hidden;
+  overflow-y: visible; /* ✅ låt bara body hantera scroll */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* === Dockan === */
+.doll-container {
+  position: relative;
+  width: 40%;
+  height: 650px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  top: 9rem;
+}
+ 
+@media (max-width: 700px) {
+  .doll-container {
+    height: 500px;
+  }
+}
+
+/* === Input-sektion === */
+.input-section {
+  position: relative;   /* 👈 inte absolute längre */
+  margin-top: 15rem;     /* flyttar ner den efter dockan */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* === Inputfält === */
+.input {
+  width: 100%;
+  min-height: 50px;
+  min-width: 220px;
+  text-align: center;
+  background: rgba(136, 131, 131, 0.2);
+  border: 1.5px solid rgba(136, 131, 131, 0.3);
+  border-radius: 12px;
+  color: #000000ff;
+  font-size: 1.1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  resize: none ;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+/* === Knapp === */
+.button--submit {
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.button--submit:hover:not(:disabled) {
+  background-color: #2563eb;
+  transform: scale(1.05);
+}
+
+.button--submit:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* === Felruta / svarsruta === */
+.error-box {
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.response-box {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1rem;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+  max-height: 675px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* === Scroll-styling === */
+.response-box::-webkit-scrollbar {
+  width: 8px;
+}
+.response-box::-webkit-scrollbar-thumb {
+  background-color: #c7d2fe;
+  border-radius: 4px;
+}
+.response-box::-webkit-scrollbar-thumb:hover {
+  background-color: #818cf8;
+}
+
+/* === Responsiv justering === */
+@media (max-width: 600px) {
+  .input-section {
+    margin-top: 2rem;
+  }
+  .input {
+    font-size: 0.95rem;
+  }
+}

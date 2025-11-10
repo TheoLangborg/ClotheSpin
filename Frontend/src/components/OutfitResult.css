@@ -1,0 +1,108 @@
+.results-box {
+  margin-top: 2rem;
+}
+
+.category h4 {
+  color: #323232;
+  margin-bottom: 0.5rem;
+}
+
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.product-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-width: 180px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.product-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.product-image-wrapper {
+  position: relative;
+}
+
+.product-image-wrapper img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.heart-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.3s ease;
+}
+
+.heart-icon:hover {
+  color: #ff4d4d;
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.6));
+}
+
+.heart-icon.fav {
+  color: #e02424;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+  animation: pulse 0.3s ease;
+}
+
+.product-info {
+  padding: 0.8rem;  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* så flex tar hela höjden */
+  padding-top: 0.5rem;
+  align-items: center;
+}
+
+.product-info h5 {
+  color: #323232;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.product-info p {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.3);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .product-item {
+    width: 100%;
+  }
+}

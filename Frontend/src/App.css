@@ -1,0 +1,163 @@
+/* === Global styling: Tesla-inspired clean look === */
+html,
+body,
+#root {
+  width: 100%;
+  height: auto;
+  min-height: 100vh;
+  background-color: #fafafaff;
+  /* 🤍 mjuk vit bakgrund */
+  color: #000000;
+  /* 🖤 nästan svart text */
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  /* smidig scroll */
+  margin: 0;
+  padding: 0;
+}
+
+/* === Scrollbar: diskret svartgrå === */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* === Centrering och maxbredd === */
+#root {
+  max-width: 1440px;
+  /* lagom för desktop */
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* === Allmänna rubriker och text === */
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: #111111;
+  letter-spacing: 0.02em;
+  margin: 0.5rem 0;
+  font-weight: 600;
+}
+
+p,
+span {
+  color: #333333;
+  line-height: 1.6;
+}
+
+/* === Länkar === */
+a {
+  color: #000000;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+a:hover {
+  border-bottom: 1px solid #000000;
+}
+
+/* === Cards / boxar (typ HomeTab info-kort) === */
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  /* transparent vit */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 1.8rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* === Knapp-stil (neutral, minimalistisk) === */
+button {
+  background-color: #111111;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #333333;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* === Transparent navbar-stöd (Tabs.jsx) === */
+.appbar-transparent {
+  background: rgba(255, 255, 255, 0.7);
+  /* vit med glas-effekt */
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* === Footer-bas === */
+footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  color: #555;
+  font-size: 0.9rem;
+  padding: 2rem 0;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+footer a {
+  color: #111;
+}
+
+footer a:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* === Små animationer: Fade-in för hela sidan === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Ta bort webbläsarens inbyggda "visa lösenord"-ikon (Chrome/Edge) */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-clear-button,
+input[type="password"]::-webkit-reveal-button {
+  display: none !important;
+}
