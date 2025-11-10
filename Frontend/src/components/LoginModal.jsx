@@ -20,15 +20,15 @@ export default function LoginModal({ onClose }) {
     try {
       if (mode === "login") {
         await signInWithEmailAndPassword(auth, email, password);
-        console.log("✅ Inloggad!");
+        
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
-        console.log("✅ Konto skapat!");
+        
       }
 
       onClose();
     } catch (err) {
-      console.error("Firebase error:", err.code);
+      
 
       let message = "Something went wrong.";
 

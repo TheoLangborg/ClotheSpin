@@ -30,7 +30,7 @@ export default function Doll() {
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
-        marginTop: "-17rem",
+        marginTop: "-10rem",
         overflow: "hidden",
         backgroundColor: "transparent",
       }}

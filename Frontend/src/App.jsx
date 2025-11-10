@@ -9,6 +9,7 @@ import AboutTab from "./components/AboutTab";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import { auth } from "./components/firebase";
+import Doll from "./components/Doll"
 
 console.log("Firebase loaded:", auth);
 
@@ -28,6 +29,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomeTab />} />
           <Route path="/generate" element={<GOTab />} /> {/* 🔹 exakt path */}
+          <Route path="/tryon" element={<Doll />} />
           <Route path="/favorites" element={<FavoritesTab />} /> {/* 🔹 exakt path */}
           <Route path="/about" element={<AboutTab />} />
         </Routes>
@@ -42,4 +44,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;  

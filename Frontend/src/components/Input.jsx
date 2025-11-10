@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import "./Input.css";
-import Doll from "./Doll";
 import OutfitResult from "./OutfitResult";
 import { useOutfit } from "./OutfitContext";
 
@@ -30,12 +29,11 @@ export default function Input({ defaultPrompt = "" }) {
       if (!res.ok) throw new Error(`Servern svarade med status ${res.status}`);
 
       const data = await res.json();
-      console.log("Svar från backend:", data);
+    
       setResponse(data);
       setOutfitResults(data);
     } catch (err) {
-      console.error("Fel vid fetch:", err);
-      setError("Något gick fel – kolla backend-servern eller API-anslutningen.");
+     
     } finally {
       setLoading(false);
     }
@@ -69,12 +67,72 @@ export default function Input({ defaultPrompt = "" }) {
 
   return (
     <div className="doll-wrapper">
-      {/* === Dockan i mitten === */}
-      <div className="doll-container">
-        <Doll />
+      {/* === Titel och intro === */}
+      <div style={{ textAlign: "center", marginBottom: "1.8rem", marginTop: "1rem" }}>
+        <h2
+          style={{
+            color: "#3b82f6",
+            textShadow: "0 0 8px rgba(59,130,246,0.5)",
+            fontWeight: 700,
+            fontSize: "2rem",
+            marginBottom: "0.4rem",
+          }}
+        >
+          Describe the look you want!
+        </h2>
+        <p
+          style={{
+            color: "#323232",
+            fontSize: "1rem",
+            maxWidth: "600px",
+            margin: "0 auto",
+            lineHeight: 1.6,
+          }}
+        >
+          Try these examples 👇
+        </p>
       </div>
 
-      {/* === Input och knapp längst ner === */}
+      {/* === Exempelknappar ovanför input === */}
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          margin: "0 auto 1.8rem auto",
+          maxWidth: "600px",
+        }}
+      >
+        {[
+          "Casual streetwear for men",
+          "All-black rock outfit",
+          "Elegant summer look for women",
+          "Retro 90s vibe",
+          "Winter city outfit",
+        ].map((ex) => (
+          <button
+            key={ex}
+            onClick={() => setPrompt(ex)}
+            style={{
+              background: "#f3f4f6",
+              color: "#323232",
+              border: "1px solid #d1d5db",
+              borderRadius: "10px",
+              padding: "6px 14px",
+              cursor: "pointer",
+              fontSize: "0.9rem",
+              transition: "all 0.25s ease",
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.background = "#e5e7eb")}
+            onMouseOut={(e) => (e.currentTarget.style.background = "#f3f4f6")}
+          >
+            {ex}
+          </button>
+        ))}
+      </div>
+
+      {/* === Input och knapp === */}
       <div className="input-section">
         <div className="input-wrapper">
           <textarea
@@ -95,7 +153,7 @@ export default function Input({ defaultPrompt = "" }) {
         </div>
       </div>
 
-      {/* === Huvudinnehåll (input + resultat) === */}
+      {/* === Resultat === */}
       <div className="page-layout">
         <div className="content-zone">
           {response && <OutfitResult response={response} />}
@@ -103,4 +161,5 @@ export default function Input({ defaultPrompt = "" }) {
       </div>
     </div>
   );
+
 }
