@@ -52,6 +52,8 @@ export default function AboutTab() {
         <br /><br />
         This is just the beginning — features like saving your favorite looks,
         personal style profiles, smart brand collaborations, and perhaps even virtual try-on are coming soon.
+        <br /><br />
+        Awin
       </Typography>
 
 
