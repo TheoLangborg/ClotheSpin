@@ -1,32 +1,30 @@
-import { Box, Typography } from "@mui/material";
-import { useEffect, useState, memo } from "react";
+import { Box } from "@mui/material";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Input from "./Input";
+import { useOutfit } from "./OutfitContext";
+import OutfitResult from "./OutfitResult";
 
+export default function GOTab() {
+  const location = useLocation();
+  const { prompt, setPrompt } = useOutfit(); // 🔥 HÄR – ANVÄND CONTEXT
+  const { outfitResults } = useOutfit();
 
-export default function GOTab({ sharedPrompt }) {
-  const location = useLocation();     // ✅ hook ska ligga här, inte i return
-  const [prompt, setPrompt] = useState("");
-
-  // 🔹 När du kommer hit via HomeTab – läs in promptText
+  // 🔹 Om du kom hit från HomeTab med en prompt
   useEffect(() => {
     if (location.state?.promptText) {
-     
+      setPrompt(location.state.promptText);
     }
-  }, [location.state]);
-
+  }, [location.state, setPrompt]);
 
   return (
-    <>
-      {/* 🔹 INPUT — kopplad till prompt */}
-      <Box
-        sx={{
-          mb: 5,
+    <Box sx={{ mb: 5 }}>
+      {/* 🔥 Input kopplad direkt till contexten */}
+      <Input />
 
-        }}
-      >
-        <Input defaultPrompt={prompt || sharedPrompt} /> {/* 👈 använder prompten */}
-      </Box>
-    </>
+      {outfitResults && (
+        <OutfitResult />
+      )}
+    </Box>
   );
 }

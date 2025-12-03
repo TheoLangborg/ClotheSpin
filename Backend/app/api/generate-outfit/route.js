@@ -2,37 +2,51 @@ import { generateOutfit } from "@/lib/generate-outfit";
 
 export async function POST(req) {
   try {
-    const { prompt } = await req.json();
+    const { prompt, filters } = await req.json();
+
     console.log("Mottaget prompt:", prompt);
+    console.log("🔥 ROUTE RECEIVED FILTERS:", filters);
 
-    const results = await generateOutfit(prompt);
-    console.log("Resultat från generateOutfit:", results);
+    const results = await generateOutfit(prompt, filters);
 
-   return new Response(JSON.stringify({ success: true, results: results }), {
+    return new Response(JSON.stringify({ success: true, results }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",           // 👈 tillåter frontend
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Origin": "*",
       },
     });
+
   } catch (err) {
     console.error("Fel:", err);
+
+    // ⭐ Specialhantering för SerpApi-limit
+    if (err.message === "SERPAPI_LIMIT_EXCEEDED") {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "SERPAPI_LIMIT_EXCEEDED",
+        }),
+        {
+          status: 429,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+    }
+
+    // Annat fel
     return new Response(
       JSON.stringify({ success: false, error: err.message }),
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",         // 👈 även vid fel
-        },
+        headers: { "Access-Control-Allow-Origin": "*" },
       }
     );
   }
 }
 
-// Hantera preflight-förfrågningar (CORS OPTIONS)
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
@@ -43,4 +57,3 @@ export async function OPTIONS() {
     },
   });
 }
-

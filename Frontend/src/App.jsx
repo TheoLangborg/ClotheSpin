@@ -1,47 +1,85 @@
 import React from "react";
 import "./App.css";
 import TopTabs from "./components/Tabs";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import HomeTab from "./components/HomeTab";
 import GOTab from "./components/GOTab";
 import FavoritesTab from "./components/FavoritesTab";
 import AboutTab from "./components/AboutTab";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
-import { auth } from "./components/firebase";
-import Doll from "./components/Doll"
+import TryOnTab from "./components/TryOnTab";
 
-console.log("Firebase loaded:", auth);
+import { SnackbarProvider, useSnackbar } from "notistack";
+import { X } from "lucide-react";
 
+// ✅ Close button component (separate!)
+function CloseButton({ snackbarKey }) {
+  const { closeSnackbar } = useSnackbar();
+
+  return (
+    <X
+      size={20}
+      color="white"
+      style={{
+        cursor: "pointer",
+        marginLeft: "10px",
+      }}
+      onClick={() => closeSnackbar(snackbarKey)}
+    />
+  );
+}
+
+// ===============================
+// ✅ HUVUDKOMPONENTEN — App()
+// ===============================
 function App() {
   return (
-    <BrowserRouter>
+   
+    <SnackbarProvider
+      maxSnack={3}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      autoHideDuration={null} // ❗ stannar tills man klickar
+      preventDuplicate
+      action={(key) => <CloseButton snackbarKey={key} />}
+      sx={{
+        "& .SnackbarItem-contentRoot": {
+          backgroundColor: "#ef4444 !important", // röd
+          color: "white",
+          borderRadius: "10px",
+          padding: "12px 18px",
+          fontSize: "1rem",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+          display: "flex",
+          alignItems: "center",
+        },
+      }}
+    >
+
       <ScrollToTop />
       <TopTabs />
 
-      {/* 🔹 Sidinnehåll med extra padding för att inte ligga bakom navbaren */}
       <div
         style={{
           minHeight: "85vh",
-          paddingTop: "110px", // <-- extra utrymme för att inte hamna bakom navbaren
+          paddingTop: "110px", // navbar spacing
         }}
       >
         <Routes>
           <Route path="/" element={<HomeTab />} />
-          <Route path="/generate" element={<GOTab />} /> {/* 🔹 exakt path */}
-          <Route path="/tryon" element={<Doll />} />
-          <Route path="/favorites" element={<FavoritesTab />} /> {/* 🔹 exakt path */}
+          <Route path="/generate" element={<GOTab />} />
+          <Route path="/tryon" element={<TryOnTab />} />
+          <Route path="/favorites" element={<FavoritesTab />} />
           <Route path="/about" element={<AboutTab />} />
         </Routes>
       </div>
 
       <div style={{ marginTop: "15rem" }}>
-        {/* 🔹 Footer längst ner på varje sida */}
         <Footer />
       </div>
 
-    </BrowserRouter>
+    </SnackbarProvider>
   );
 }
 
-export default App;  
+export default App;

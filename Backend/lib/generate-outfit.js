@@ -1,202 +1,154 @@
-// === 🧩 Lägg högst upp i generate-outfit.js ===
+// /src/pages/api/generate-outfit.js
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-// 🟢 1. Hämta produkter från Adtraction
-async function fetchAdtractionProducts(query) {
-  const ADTRACTION_API_KEY = process.env.ADTRACTION_API_KEY;
+import gpt from "@/lib/gpt";
+import { products } from "@/lib/products";
 
-  if (!ADTRACTION_API_KEY) return [];
+// ======================================================
+// ⭐ MAIN FUNCTION
+// ======================================================
+export async function generateOutfit(prompt, filters = {}) {
+  console.log("🧠 Interpreting AI prompt...");
+  console.log("🔥 BACKEND RECEIVED FILTERS:", JSON.stringify(filters, null, 2));
 
-  try {
-    const res = await fetch(
-      `https://api.adtraction.com/v2/products?query=${encodeURIComponent(
-        query
-      )}&token=${ADTRACTION_API_KEY}`
-    );
+  const ai = await gpt.interpretPrompt(prompt);
 
-    if (!res.ok) return [];
+  // Fallbackvärden
+  const gender = ai?.gender || "unisex";
+  const style = ai?.style || "other";
+  const season = ai?.season || "all-year";
+  const budget = ai?.budget || "medium";
+  const colorScheme = ai?.color_scheme || [];
 
-    const data = await res.json();
-    // Anpassa beroende på deras exakta svarstruktur
-    return data.products || data.items || [];
-  } catch (err) {
-    console.warn("⚠️ Adtraction API-fel, använder fallback:", err);
-    return [];
-  }
-}
+  // GPT genererade sökfraser
+  const allCategories = [
+    { key: "top", queries: ai?.top || [] },
+    { key: "bottom", queries: ai?.bottom || [] },
+    { key: "shoes", queries: ai?.shoes || [] },
+    { key: "accessories", queries: ai?.accessories || [] },
+  ];
 
-// 🟣 2. Hämta produkter från Awin
-async function fetchAwinProducts(query) {
-  const AWIN_API_KEY = process.env.AWIN_API_KEY;
+  // Vilka kategorier är valda i frontend?
+  const allowedKeys = Array.isArray(filters.categories)
+    ? filters.categories
+    : Array.isArray(filters.selectedCategories)
+      ? filters.selectedCategories
+      : ["top", "bottom", "shoes", "accessories"];
 
-  if (!AWIN_API_KEY) return [];
+  const activeCategories = allCategories.filter((c) =>
+    allowedKeys.includes(c.key)
+  );
 
-  try {
-    const res = await fetch(
-      `https://api.awin.com/products?query=${encodeURIComponent(
-        query
-      )}&accessToken=${AWIN_API_KEY}`
-    );
+  // ⭐ Alltid 12 items totalt
+  const TOTAL_ITEMS = 12;
+  const categoryCount = activeCategories.length;
+  let perCategoryLimit = Math.floor(TOTAL_ITEMS / categoryCount);
 
-    if (!res.ok) return [];
+  if (perCategoryLimit < 1) perCategoryLimit = 1;
 
-    const data = await res.json();
-    return data.products || [];
-  } catch (err) {
-    console.warn("⚠️ AWIN API-fel, använder fallback:", err);
-    return [];
-  }
-}
+  console.log("🎯 Active categories:", activeCategories.map(c => c.key));
+  console.log("🎯 Per category limit:", perCategoryLimit);
 
-export async function generateOutfit(prompt) {
-  try {
-    // 🧩 Översätt svenska ord → engelska för bättre SerpApi-resultat
-    const translatedPrompt = prompt
-      .replace(/herr/gi, "men")
-      .replace(/dam/gi, "women")
-      .replace(/kille/gi, "men")
-      .replace(/tjej/gi, "women")
-      .replace(/outfit/gi, "clothing")
-      .replace(/stil/gi, "style")
-      .replace(/svart/gi, "black")
-      .replace(/vit/gi, "white")
-      .replace(/grön/gi, "green")
-      .replace(/brun/gi, "brown");
+  const results = {};
 
-    // 🧠 Förbättrad prompt-tolkning för kön
-    let basePrompt = translatedPrompt;
-    if (
-      prompt.toLowerCase().includes("girl") ||
-      prompt.toLowerCase().includes("woman") ||
-      prompt.toLowerCase().includes("female") ||
-      prompt.toLowerCase().includes("girls") ||
-      prompt.toLowerCase().includes("womans") ||
-      prompt.toLowerCase().includes("¨lady") ||
-      prompt.toLowerCase().includes("ladies") ||
-      prompt.toLowerCase().includes("females")
-    ) {
-      basePrompt += " for women";
-    } else if (
-      prompt.toLowerCase().includes("boy") ||
-      prompt.toLowerCase().includes("man") ||
-      prompt.toLowerCase().includes("male") ||
-      prompt.toLowerCase().includes("boys") ||
-      prompt.toLowerCase().includes("mens") ||
-      prompt.toLowerCase().includes("guy") ||
-      prompt.toLowerCase().includes("guys") ||
-      prompt.toLowerCase().includes("mans") ||
-      prompt.toLowerCase().includes("males")
-    ) {
-      basePrompt += " for men";
-    } else {
-      basePrompt += " outfit for women"; // 👈 default till women
+  // ======================================================
+  // ⭐ LOOP PER CATEGORY
+  // ======================================================
+  for (const { key, queries } of activeCategories) {
+    // 🎯 Slumpa en av GPT:s keywords
+    let keyword = null;
+
+    if (Array.isArray(queries) && queries.length > 0) {
+      keyword = queries[Math.floor(Math.random() * queries.length)];
     }
 
-    // 🔹 Kategorier
-    const categories = [
-      { key: "top", label: "shirt OR hoodie OR jacket OR t-shirt OR sweatshirt" },
-      { key: "bottom", label: "pants OR jeans OR shorts OR trousers" },
-      { key: "shoes", label: "shoes OR sneakers OR boots" },
-      { key: "accessories", label: "watch OR cap OR hat OR sunglasses OR chain" },
-    ];
+    // Fallback om GPT ger tomt
+    if (!keyword) {
+      keyword = `${gender} ${key} ${style}`;
+    }
 
-    const results = {};
+    console.log(`🔍 Fetching products for: "${keyword}" [${key}]`);
 
-    for (const { key, label } of categories) {
-      // 🧩 Lägg till variation för naturligare resultat
-      const randomizer = [
-        "trendy", "new", "unique", "aesthetic", "modern",
-        "2025 fashion", "streetwear", "stylish", "cool look"
-      ][Math.floor(Math.random() * 9)];
+    const list = await products.search(keyword, {
+  category: key,
+  filters,
+  gender,
+});
 
-      const searchQuery = `${basePrompt} ${label} ${randomizer}`;
+// Om API-limit → returnera tydligt fel till frontend
+if (list?.error === "SERPAPI_LIMIT") {
+  return {
+    meta: { error: "SERPAPI_LIMIT" },
+    results: {},
+  };
+}
 
-      // --- 1️⃣ Testa Awin först ---
-      console.log(`🟣 Fetching from AWIN for [${key}]:`, searchQuery);
-      const awinResults = await fetchAwinProducts(searchQuery);
-      if (awinResults && awinResults.length > 0) {
-        console.log(`✅ [${key}] Using Awin results (${awinResults.length} items)`);
-        results[key] = awinResults.map((p) => ({
-          name: p.name || "Unknown product",
-          price: p.price || "N/A",
-          image: p.image || "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
-          link: p.tracking_link || "#",
-          affiliate: true,
-          source: "Awin",
-        }));
-        continue; // hoppa över Adtraction/SerpApi
-      }
 
-      // --- 2️⃣ Testa Adtraction ---
-      console.log(`🟢 Fetching from ADTRACTION for [${key}]:`, searchQuery);
-      const adtractionResults = await fetchAdtractionProducts(searchQuery);
-      if (adtractionResults && adtractionResults.length > 0) {
-        console.log(`✅ [${key}] Using Adtraction results (${adtractionResults.length} items)`);
-        results[key] = adtractionResults.map((p) => ({
-          name: p.name || "Unknown product",
-          price: p.price || "N/A",
-          image: p.image || "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
-          link: p.tracking_link || p.url || "#",
-          affiliate: true,
-          source: "Adtraction",
-        }));
-        continue;
-      }
-
-      // --- 3️⃣ Annars: SerpApi fallback ---
-      console.log(`🪄 Using SerpApi fallback for [${key}] →`, searchQuery);
-      const serpRes = await fetch(
-        `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(
-          searchQuery
-        )}&hl=en&gl=us&api_key=${process.env.SERP_API_KEY ||
-        "28f74699766b83a2dc2ae0bfef422cd14991ad7a86948aa29a247a948ae29354"
-        }`
-      );
-      const serpData = await serpRes.json();
-
-      const toAbsolute = (u) => {
-        if (!u) return null;
-        if (u.startsWith("//")) return "https:" + u;
-        if (/^https?:\/\//.test(u)) return u;
-        return null;
-      };
-
-      const raw = serpData.shopping_results || [];
-      const serpItems = raw
-        .map((p) => {
-          const link = toAbsolute(p.link) || toAbsolute(p.product_link);
-          const image = toAbsolute(p.thumbnail);
-          if (!link || !image) return null;
-          return {
-            name: p.title || "Unknown product",
-            price: p.price || "N/A",
-            image,
-            link,
+    const finalList =
+      list.length > 0
+        ? list.slice(0, perCategoryLimit)
+        : [
+          {
+            name: `No ${key} items found`,
+            price: "-",
+            image:
+              "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+            link: "#",
             affiliate: false,
-            source: "SerpApi",
-          };
-        })
-        .filter(Boolean)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
+            source: "Fallback",
+            category: key,
+          },
+        ];
 
-      if (serpItems.length === 0) {
-        serpItems.push({
-          name: `No ${key} items found`,
-          price: "-",
-          image:
-            "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
-          link: "#",
-          affiliate: false,
-          source: "Fallback",
-        });
-      }
+    results[key] = finalList.map((p) => ({
+      ...p,
+      category: key,
+      addedAt: Date.now(),
+    }));
+  }
 
-      results[key] = serpItems;
-    }
+  // Metadata
+  const meta = {
+    prompt,
+    gender,
+    style,
+    season,
+    budget,
+    colorScheme,
+    generatedAt: Date.now(),
+  };
 
-    return results;
+  return { meta, results };
+}
+
+// ======================================================
+// ⭐ API HANDLER (Next.js Pages Router)
+// ======================================================
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      success: false,
+      error: "Only POST allowed",
+    });
+  }
+
+  const { prompt, filters } = req.body || {};
+
+  if (!prompt) {
+    return res.status(400).json({
+      success: false,
+      error: "Missing prompt",
+    });
+  }
+
+  try {
+    const { meta, results } = await generateOutfit(prompt, filters || {});
+    return res.status(200).json({ success: true, meta, results });
   } catch (err) {
-    console.error("❌ Fel i API:", err);
-    throw new Error("Något gick fel med API-anropet");
+    console.error("❌ API Error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
 }

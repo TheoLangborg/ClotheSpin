@@ -1,0 +1,256 @@
+/* Mörk bakgrund + blur bakom panelen */
+.filter-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  z-index: 1500;
+}
+
+/* Själva "lådan" som glider in från vänster */
+.filter-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: min(380px, 90vw); /* 🔥 ändra enkelt om du vill ha bredare/smalare */
+  background: #ffffff;
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.25);
+  padding: 16px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  animation: slideInFromLeft 0.25s ease-out;
+}
+
+.filter-panel.closing {
+  animation: slideOutToLeft 0.25s ease-out forwards;
+}
+
+/* animation */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Hide overlay click-blocking */
+.overlay-hide {
+  pointer-events: none;
+  background: transparent;
+}
+
+/* Slide-in + slide-out panels */
+.slide-in {
+  animation: slideInFromLeft 0.25s ease-out forwards;
+}
+
+.slide-out {
+  animation: slideOutToLeft 0.25s ease-out forwards;
+}
+
+@keyframes slideOutToLeft {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(-100%); opacity: 0; }
+}
+
+/* X-knapp */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #555;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Titel */
+.filter-title {
+  margin: 6px 0 16px 2px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Scrollbart innehåll – apply-knapp ligger still nedanför */
+.filter-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Sektioner (accordion-känsla) */
+.filter-section {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 6px 0 10px 0;
+}
+
+.filter-section-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-section-header:hover {
+  color: #111827;
+  
+}
+
+.filter-section-body {
+  padding: 4px 0 8px 0;
+}
+
+/* pilen som roterar när sektionen är öppen */
+.chevron {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.chevron-open {
+  transform: rotate(180deg);
+}
+
+/* checkbox-rad */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+/* liten text under sliders */
+.value {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+/* block för per-category sliders */
+.category-price-block {
+  margin-top: 10px;
+}
+
+.category-label {
+  text-transform: capitalize;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+/* Apply-knappen längst ned */
+.apply-btn {
+  margin-top: 12px;
+  width: 100%;
+  background: #3b82f6;
+  border: none;
+  padding: 10px;
+  color: white;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.apply-btn:hover {
+  background: #2563eb;
+}
+
+/* Chevron ska alltid synas */
+.chevron {
+  opacity: 1 !important;
+  color: #000;
+  transition: transform 0.2s ease;
+}
+
+
+/* ================================
+   REMOVE ALL MUI FOCUS SHADOWS
+   ================================ */
+
+/* Ta bort focus/active-styles på ALLA MUI inputs, sliders, checkboxes */
+.Mui-focusVisible,
+.MuiCheckbox-root.Mui-focusVisible,
+.MuiCheckbox-root:focus,
+.MuiCheckbox-root:focus-visible,
+.MuiFormControlLabel-root.Mui-focusVisible,
+.MuiFormControlLabel-root:focus-visible,
+.MuiSlider-root:focus,
+.MuiSlider-root.Mui-focusVisible,
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline,
+.MuiOutlinedInput-root:focus .MuiOutlinedInput-notchedOutline {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: inherit !important;
+}
+
+/* Ta bort default focus-ring som webbläsare kan lägga på */
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* TextField border när focused */
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #3b82f6 !important; /* eller transparent om du vill helt ren */
+  box-shadow: none !important;
+}
+/* ============ REMOVE FOCUS RINGS ON FILTER PANEL BUTTONS ============ */
+.filter-panel button:focus,
+.filter-panel button:focus-visible,
+.filter-panel button:active,
+.filter-panel button::-moz-focus-inner {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* tar bort default blå/svart highlight runt interactive elements */
+/* === Remove focus ripple / focus background ONLY inside filter panel === */
+.filter-panel *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+.filter-panel button {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* fade blur overlay */
+.overlay-show {
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+.overlay-hide {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* slide panel */
+.panel-show {
+  transform: translateX(0);
+  transition: transform 0.25s ease;
+}
+.panel-hide {
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+}
+
+
+
+

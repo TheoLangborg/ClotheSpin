@@ -22,16 +22,16 @@ export default function TopTabs() {
   const [showArrows, setShowArrows] = useState(false);
 
   // 🔹 Flikar
-  const currentTab =
+  let currentTab =
     location.pathname === "/about"
-      ? 4
-      : location.pathname === "/favorites"
-        ? 3
-        : location.pathname === "/tryon"
-          ? 2
-          : location.pathname === "/generate"
-            ? 1
-            : 0;
+      ? 3
+      : location.pathname === "/tryon"
+        ? 2
+        : location.pathname === "/generate"
+          ? 1
+          : location.pathname === "/"
+            ? 0
+            : false; // <-- alla andra routes (t.ex. /favorites)
 
   // 🔹 Scrolla upp varje gång tab ändras
   useEffect(() => {
@@ -50,6 +50,21 @@ export default function TopTabs() {
       window.removeEventListener("open-profile", handleOpenProfile);
     };
   }, []);
+  
+  // 🔹 Lyssna på event från result-sidan
+  useEffect(() => {
+    const handleSwitchTab = (e) => {
+      if (!e.detail || !e.detail.tab) return;
+
+      if (e.detail.tab === "tryon") navigate("/tryon");
+      if (e.detail.tab === "generate") navigate("/generate");
+      if (e.detail.tab === "home") navigate("/");
+      if (e.detail.tab === "about") navigate("/about");
+    };
+
+    window.addEventListener("switch-tab", handleSwitchTab);
+    return () => window.removeEventListener("switch-tab", handleSwitchTab);
+  }, []);
 
   // 🔹 Kolla om tabsen får plats (visa pilar om de inte gör det)
   useEffect(() => {
@@ -57,7 +72,7 @@ export default function TopTabs() {
       const el = tabsRef.current;
       if (!el) return;
       const needsScroll = el.scrollWidth > el.clientWidth + 1;
-      
+
       setShowArrows(needsScroll);
     };
 
@@ -89,7 +104,14 @@ export default function TopTabs() {
           zIndex: 1100,
         }}
       >
-        <Toolbar sx={{ justifyContent: "space-between", position: "relative" }}>
+        <Toolbar
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            overflow: "visible",     // 🟢 viktiga ändringen
+          }}
+        >
           <Typography
             variant="h6"
             sx={{
@@ -111,9 +133,10 @@ export default function TopTabs() {
               display: "flex",
               alignItems: "center",
               overflow: "visible",
-              maxWidth: "60vw",
               minWidth: 0,
               gap: 8,
+              maxWidth: "100%",
+              flexShrink: 1,
             }}
           >
             {/* 🔸 Vänsterpil */}
@@ -129,8 +152,7 @@ export default function TopTabs() {
                     if (next === 0) navigate("/");
                     if (next === 1) navigate("/generate");
                     if (next === 2) navigate("/tryon");
-                    if (next === 3) navigate("/favorites");
-                    if (next === 4) navigate("/about");
+                    if (next === 3) navigate("/about");
                   }
                 }}
                 sx={{
@@ -149,8 +171,7 @@ export default function TopTabs() {
                 if (newValue === 0) navigate("/");
                 if (newValue === 1) navigate("/generate");
                 if (newValue === 2) navigate("/tryon");
-                if (newValue === 3) navigate("/favorites");
-                if (newValue === 4) navigate("/about");
+                if (newValue === 3) navigate("/about");
               }}
               variant="standard"
               scrollButtons={false}
@@ -170,12 +191,13 @@ export default function TopTabs() {
                 if (scroller) tabsRef.current = scroller;
               }}
               sx={{
+
                 "& .MuiTabs-flexContainer": {
                   flexWrap: "nowrap",
                 },
                 "& .MuiTab-root": {
                   flex: "0 0 auto",
-                  minWidth: 0,
+                  minWidth: "max-content",
                   textTransform: "none",
                   fontWeight: 500,
                   color: "#000",
@@ -200,7 +222,6 @@ export default function TopTabs() {
               <Tab label="Home" />
               <Tab label="Generate Outfit" />
               <Tab label="Virtual Try-On" />
-              <Tab label="Favorites" />
               <Tab label="About" />
             </Tabs>
 
@@ -217,8 +238,7 @@ export default function TopTabs() {
                     if (next === 0) navigate("/");
                     if (next === 1) navigate("/generate");
                     if (next === 2) navigate("/tryon");
-                    if (next === 3) navigate("/favorites");
-                    if (next === 4) navigate("/about");
+                    if (next === 3) navigate("/about");
                   }
                 }}
                 sx={{
@@ -231,8 +251,9 @@ export default function TopTabs() {
               />
             )}
           </div>
-
-          <ProfileMenu />
+          <div style={{ flexshrink: 0, marginRight: "40px" }}>
+            <ProfileMenu />
+          </div>
         </Toolbar>
       </AppBar>
 

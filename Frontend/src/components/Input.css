@@ -2,9 +2,11 @@
 .page-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;  /* gör att sidan växer med innehåll */
+  min-height: 100vh;
+  /* gör att sidan växer med innehåll */
   overflow-x: hidden;
-  overflow-y: visible; /* ✅ låt bara body hantera scroll */
+  overflow-y: visible;
+  /* ✅ låt bara body hantera scroll */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,7 +24,7 @@
   margin: 0 auto;
   top: 9rem;
 }
- 
+
 @media (max-width: 700px) {
   .doll-container {
     height: 500px;
@@ -31,8 +33,10 @@
 
 /* === Input-sektion === */
 .input-section {
-  position: relative;   /* 👈 inte absolute längre */
-  margin-top: 15rem;     /* flyttar ner den efter dockan */
+  position: relative;
+  /* 👈 inte absolute längre */
+  margin-top: 15rem;
+  /* flyttar ner den efter dockan */
   width: 100%;
   display: flex;
   justify-content: center;
@@ -61,7 +65,7 @@
   font-size: 1.1rem;
   outline: none;
   transition: all 0.3s ease;
-  resize: none ;
+  resize: none;
 }
 
 .input:focus {
@@ -120,10 +124,12 @@
 .response-box::-webkit-scrollbar {
   width: 8px;
 }
+
 .response-box::-webkit-scrollbar-thumb {
   background-color: #c7d2fe;
   border-radius: 4px;
 }
+
 .response-box::-webkit-scrollbar-thumb:hover {
   background-color: #818cf8;
 }
@@ -133,7 +139,66 @@
   .input-section {
     margin-top: 2rem;
   }
+
   .input {
     font-size: 0.95rem;
   }
 }
+
+.filter-bar {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 8px auto 10px auto;
+}
+
+.button--filter {
+  background: #ffffff;
+  border: 1px solid #cfcfcf;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #333;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.button--filter:hover {
+  background: #f3f3f3;
+  border-color: #999;
+}
+
+.button--filter:active {
+  transform: scale(0.97);
+}
+
+.filter-btn {
+  margin: 18px auto;
+  padding: 12px 30px;
+  background: #f3f4f6;
+  /* ljusgrå */
+  border: 1px solid #d1d5db;
+  /* tunn ljus kant */
+  border-radius: 4px;
+  /* rektangulär men rundad */
+  font-size: 15px;
+  font-weight: 500;
+  color: #323232;
+  /* mörk text */
+  cursor: pointer;
+  display: block;
+  transition: 0.25s ease;
+}
+
+.filter-btn:hover {
+  background: #e7e7e7;
+  /* lite mörkare grå */
+}
+
+.filter-btn:active {
+  background: #dcdcdc;
+  /* mörkare vid klick */
+}
+

@@ -44,14 +44,14 @@ export default function AboutTab() {
         </Box>
 
         ClotheSpin is a project created by <strong>Theo Langborg</strong> — blending
-        technology and fashion into one seamless AI experience.
+        technology and fashion into one seamless experience.
         <br /><br />
         The goal is to make outfit inspiration effortless. Instead of browsing countless
         stores, you describe what you want — and ClotheSpin finds it for you, using real
         product data and intelligent matching.
         <br /><br />
         This is just the beginning — features like saving your favorite looks,
-        personal style profiles, smart brand collaborations, and perhaps even virtual try-on are coming soon.
+        personal style profiles, smart brand collaborations, and virtual try-on are coming soon.
         <br /><br />
         Awin
       </Typography>

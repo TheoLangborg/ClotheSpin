@@ -1,9 +1,10 @@
 // src/components/Doll.jsx
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Bounds } from "@react-three/drei";
 import AnimatedModel from "./AnimatedModel";
 import { ClipLoader } from "react-spinners";
+import * as THREE from "three";
 
 useGLTF.preload("/doll.glb");
 
@@ -19,7 +20,64 @@ function CanvasInvalidator() {
   return null;
 }
 
+// === Auto-rotation + screenshot capture ===
+function AutoCapture({ modelRef }) {
+  const { gl, scene, camera } = useThree();
+
+  useEffect(() => {
+    let running = false;
+
+    async function exportFrames() {
+      if (!modelRef.current || running) return;
+      running = true;
+
+      console.log("⏳ Waiting for final render...");
+      await new Promise((res) => setTimeout(res, 1200));
+
+      const total = 12;
+      const angleStep = 360 / total;
+
+      // 🔥 Viktigt: kör render loop under export
+      const oldLoop = gl.getContextAttributes().preserveDrawingBuffer;
+
+      gl.getContext().canvas.style.background = "transparent";
+      gl.setClearColor(0x000000, 0);
+      scene.background = null;
+
+      for (let i = 0; i < total; i++) {
+        modelRef.current.rotation.y = THREE.MathUtils.degToRad(i * angleStep);
+
+        // 🔥 Vänta på render
+        await new Promise((res) => requestAnimationFrame(res));
+
+        gl.render(scene, camera);
+
+        // 🔥 Vänta på GPU
+        await new Promise((res) => setTimeout(res, 80));
+
+        const png = gl.domElement.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = png;
+        link.download = `frame${i}.png`;
+        link.click();
+
+        console.log("Saved frame:", i);
+      }
+
+      console.log("✔ Done!");
+    }
+
+    exportFrames();
+  }, [modelRef, gl, scene, camera]);
+
+  return null;
+}
+
+
+
 export default function Doll() {
+  const modelRef = useRef();
+
   return (
     <div
       className="doll-container"
@@ -42,26 +100,17 @@ export default function Doll() {
           top: "1rem",
           textAlign: "center",
           color: "#3b82f6",
-          textShadow: "0 0 12px rgba(34, 105, 220, 0.8)",
+          textShadow: "0 0 12px rgba(34,105,220,0.8)",
           fontWeight: 600,
           letterSpacing: "1px",
           fontSize: "1.5rem",
           zIndex: 10,
         }}
       >
-        AI Outfit Preview! 👗{" "}
-        <span
-          style={{
-            color: "#3b82f6",
-            textShadow: "0 0 12px rgba(34, 105, 220, 0.8)",
-            fontSize: "1.2rem",
-          }}
-        >
-          Coming Soon...
-        </span>
+        Generating Try-On Frames...
       </h2>
 
-      {/* === Loader över Canvas === */}
+      {/* === Loader === */}
       <Suspense
         fallback={
           <div
@@ -86,8 +135,7 @@ export default function Doll() {
           style={{ backgroundColor: "transparent", width: "100%", height: "100%" }}
           gl={{ preserveDrawingBuffer: true, alpha: true }}
           onCreated={({ gl, scene }) => {
-            const bodyBg = getComputedStyle(document.body).backgroundColor;
-            gl.setClearColor(bodyBg, 1);
+            gl.setClearColor(0x000000, 0);
             scene.background = null;
           }}
           camera={{
@@ -104,12 +152,15 @@ export default function Doll() {
 
           <CanvasInvalidator />
 
-          {/* === 3D-modell === */}
+          {/* Modell med ref så vi kan rotera */}
           <Bounds fit clip observe margin={1.4}>
-            <group position={[0, -1.2, 0]} scale={1.1}>
+            <group ref={modelRef} position={[0, -1.2, 0]} scale={1.1}>
               <AnimatedModel />
             </group>
           </Bounds>
+
+          {/* Ta frames automatiskt */}
+          <AutoCapture modelRef={modelRef} />
 
           <OrbitControls
             target={[0, 0, 0]}
@@ -123,4 +174,3 @@ export default function Doll() {
     </div>
   );
 }
-
